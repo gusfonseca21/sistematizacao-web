@@ -1,0 +1,19 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+.react-datepicker__header {
+  @apply bg-custom-background border-none;
+}
+
+.react-datepicker-popper[data-placement^='bottom'] .react-datepicker__triangle {
+  @apply fill-custom-background text-custom-background stroke-custom-background;
+}
+
+.react-datepicker-wrapper {
+  @apply font-normal;
+}
+
+.react-datepicker__month-container {
+  @apply text-custom-light-grey;
+}
