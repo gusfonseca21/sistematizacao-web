@@ -1,6 +1,4 @@
-import SpecialtySelector from './selector/SpecialtySelector';
-import DoctorSelector from './selector/DoctorSelector';
-import DateSelector from './selector/DateSelector';
+import Selectors from './selector/Selectors';
 
 export default function Card() {
   return (
@@ -11,9 +9,7 @@ export default function Card() {
         </span>
       </div>
       <div className="flex size-full flex-row justify-between ">
-        <SpecialtySelector />
-        <DoctorSelector />
-        <DateSelector />
+        <Selectors />
       </div>
     </div>
   );
