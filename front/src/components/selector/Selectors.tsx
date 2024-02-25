@@ -20,13 +20,13 @@ export default function Selectors() {
   }
 
   return (
-    <>
+    <div className="flex flex-row gap-10">
       <SpecialtySelector setSpecialtyId={setSelectedSpecialtyIdHandler} />
       <DoctorSelector
         specialtyId={selectedSpecialtyId}
         setDoctorId={setSelectedDoctorIdHandler}
       />
       <DateSelector doctorId={selectedDoctorId} />
-    </>
+    </div>
   );
 }

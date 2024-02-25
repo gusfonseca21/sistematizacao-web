@@ -60,8 +60,6 @@ export default function DateSelector({ doctorId }: DateSelectorProps) {
 
   useEffect(() => {
     if (!doctorDates || !selectedDate) return;
-    // const appointDates = doctorDates?.map((appoint) => parseISO(appoint.date));
-    // console.log('selectedDate', selectedDate.getDate());
     const appointDates = doctorDates
       ?.map((appoint) => parseISO(appoint.date))
       .filter((appoint) => appoint.getDate() === selectedDate.getDate())
@@ -101,7 +99,11 @@ export default function DateSelector({ doctorId }: DateSelectorProps) {
         dateFormat="dd/MM/yyyy 'às' HH:mm"
         placeholderText="Data"
         // eslint-disable-next-line tailwindcss/migration-from-tailwind-2
-        className="!focus:border-red-500 w-full rounded-[4px] border border-custom-light-grey border-opacity-40 p-[0.4rem]"
+        className={`!focus:border-red-500 w-full ${
+          !doctorId ? '' : 'cursor-pointer'
+        } rounded-[4px] border border-custom-light-grey border-opacity-40 p-[0.4rem] ${
+          !doctorId ? 'bg-[#F2F2F2]' : 'bg-white'
+        }`}
         calendarContainer={DateContainer}
         // minTime={setHours(setMinutes(new Date(), 0), 6)}
         // maxTime={setHours(setMinutes(new Date(), 0), 18)}

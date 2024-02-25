@@ -32,6 +32,19 @@ async function getDoctorsBySpecialty(specialtyId: number) {
   }
 }
 
+const customStyles = {
+  //@ts-expect-error erro do tipo de estilo
+  option: (styles) => ({
+    ...styles,
+    cursor: 'pointer'
+  }),
+  //@ts-expect-error erro do tipo de estilo
+  control: (styles) => ({
+    ...styles,
+    cursor: 'pointer'
+  })
+};
+
 export default function DoctorSelector({ specialtyId, setDoctorId }: Props) {
   const [doctors, setDoctors] = useState<Doctor[] | undefined>(undefined);
 
@@ -60,6 +73,7 @@ export default function DoctorSelector({ specialtyId, setDoctorId }: Props) {
         onChange={(newValue) => setDoctorId(Number(newValue?.id))}
         className="w-full"
         maxMenuHeight={200}
+        styles={customStyles}
       />
     </SelectorWrapper>
   );

@@ -26,6 +26,19 @@ async function getAllSpecialties() {
   }
 }
 
+const customStyles = {
+  //@ts-expect-error erro do tipo de estilo
+  option: (styles) => ({
+    ...styles,
+    cursor: 'pointer'
+  }),
+  //@ts-expect-error erro do tipo de estilo
+  control: (styles) => ({
+    ...styles,
+    cursor: 'pointer'
+  })
+};
+
 export default function SpecialtySelector({ setSpecialtyId }: Props) {
   const [specialties, setSpecialties] = useState<Specialty[] | undefined>(
     undefined
@@ -50,6 +63,7 @@ export default function SpecialtySelector({ setSpecialtyId }: Props) {
         onChange={(newValue) => setSpecialtyId(Number(newValue?.id))}
         className="w-full"
         maxMenuHeight={200}
+        styles={customStyles}
       />
     </SelectorWrapper>
   );
