@@ -6,13 +6,13 @@ import { useEffect, useState } from 'react';
 import { Doctor } from '@shared/index';
 
 interface Props {
-  specialtyId: number | undefined;
-  setDoctorId: (doctorId: number) => void;
+  specialtyId: string;
+  setDoctorId: (doctorId: string) => void;
 }
 
 const URL = import.meta.env.VITE_BACKEND_URL;
 
-async function getDoctorsBySpecialty(specialtyId: number) {
+async function getDoctorsBySpecialty(specialtyId: string) {
   try {
     const { data, status } = await axios.get(
       `${URL}/appointments/doctors?id_specialty=${specialtyId}`
@@ -32,19 +32,6 @@ async function getDoctorsBySpecialty(specialtyId: number) {
   }
 }
 
-const customStyles = {
-  //@ts-expect-error erro do tipo de estilo
-  option: (styles) => ({
-    ...styles,
-    cursor: 'pointer'
-  }),
-  //@ts-expect-error erro do tipo de estilo
-  control: (styles) => ({
-    ...styles,
-    cursor: 'pointer'
-  })
-};
-
 export default function DoctorSelector({ specialtyId, setDoctorId }: Props) {
   const [doctors, setDoctors] = useState<Doctor[] | undefined>(undefined);
 
@@ -60,6 +47,19 @@ export default function DoctorSelector({ specialtyId, setDoctorId }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [specialtyId]);
 
+  const customStyles = {
+    //@ts-expect-error erro do tipo de estilo
+    option: (styles) => ({
+      ...styles,
+      cursor: 'pointer'
+    }),
+    //@ts-expect-error erro do tipo de estilo
+    control: (styles) => ({
+      ...styles,
+      cursor: specialtyId ? 'pointer' : 'not-allowed'
+    })
+  };
+
   return (
     <SelectorWrapper>
       <img src={docIcon} alt="Ícone especialidade" className="h-10" />
@@ -69,9 +69,12 @@ export default function DoctorSelector({ specialtyId, setDoctorId }: Props) {
         isDisabled={!doctors}
         options={doctors}
         getOptionLabel={(option) => option.name}
-        getOptionValue={(option) => option.id.toString()}
-        onChange={(newValue) => setDoctorId(Number(newValue?.id))}
-        className="w-full"
+        getOptionValue={(option) => option.id.toString() as string}
+        onChange={(newValue) => {
+          // @ts-expect-error Erro em relação ao tipo esperado de newValue
+          setDoctorId(newValue?.id);
+        }}
+        className="!pointer-events-auto w-full"
         maxMenuHeight={200}
         styles={customStyles}
       />

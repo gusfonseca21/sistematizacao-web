@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
 import InputWrapper from './InputWrapper';
 
-export default function NameInput() {
-  const [name, setName] = useState<string | undefined>(undefined);
+interface Props {
+  dateIsSet: boolean;
+  setPatientNameHandler: (value: string) => void;
+}
 
+export default function NameInput({ setPatientNameHandler, dateIsSet }: Props) {
   return (
     <InputWrapper>
       <input
         type="text"
         placeholder="Seu nome"
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e) => setPatientNameHandler(e.target.value)}
         maxLength={25}
         minLength={5}
-        value={name}
-        className="justify-center px-1 py-2 text-center text-custom-text outline-none"
+        className={`justify-center px-1 py-2 text-center text-custom-text outline-none  ${
+          dateIsSet ? 'cursor-pointer' : 'cursor-not-allowed'
+        }`}
+        disabled={!dateIsSet}
       />
     </InputWrapper>
   );

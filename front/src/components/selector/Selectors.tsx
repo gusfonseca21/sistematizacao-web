@@ -3,20 +3,25 @@ import SpecialtySelector from './SpecialtySelector';
 import DoctorSelector from './DoctorSelector';
 import DateSelector from './DateSelector';
 
-export default function Selectors() {
-  const [selectedSpecialtyId, setSelectedSpecialtyId] = useState<
-    number | undefined
-  >(undefined);
-  const [selectedDoctorId, setSelectedDoctorId] = useState<number | undefined>(
-    undefined
-  );
+interface Props {
+  setDocorIdHandler: (value: string) => void;
+  setDateHandler: (value: string) => void;
+}
 
-  function setSelectedSpecialtyIdHandler(specialtyId: number) {
+export default function Selectors({
+  setDocorIdHandler,
+  setDateHandler
+}: Props) {
+  const [selectedSpecialtyId, setSelectedSpecialtyId] = useState<string>('');
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string>('');
+
+  function setSelectedSpecialtyIdHandler(specialtyId: string) {
     setSelectedSpecialtyId(specialtyId);
   }
 
-  function setSelectedDoctorIdHandler(doctorId: number) {
-    setSelectedDoctorId(doctorId);
+  function setSelectedDoctorIdHandler(doctorId: string) {
+    setSelectedDoctorId(String(doctorId));
+    setDocorIdHandler(String(doctorId));
   }
 
   return (
@@ -26,7 +31,10 @@ export default function Selectors() {
         specialtyId={selectedSpecialtyId}
         setDoctorId={setSelectedDoctorIdHandler}
       />
-      <DateSelector doctorId={selectedDoctorId} />
+      <DateSelector
+        doctorId={selectedDoctorId}
+        setDateHandler={setDateHandler}
+      />
     </div>
   );
 }

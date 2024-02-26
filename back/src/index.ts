@@ -1,4 +1,5 @@
 import {
+  createAppointment,
   getAllSpecialties,
   getDoctorDates,
   getSpecialtyDoctor,
@@ -10,8 +11,14 @@ const db = await connectDatabase();
 const headers = new Headers({
   "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
   "Access-Control-Allow-Origin": "*",
-  "Content-Type": "application/json",
+  "Content-Type": "application/json, Content-Type",
 });
+
+const preflightHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "OPTIONS, POST",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 
 const server = Bun.serve({
   port: 3000,
@@ -27,6 +34,11 @@ const server = Bun.serve({
     const splittedPath = pathname.split("/");
     const resource = splittedPath[1];
     const service = splittedPath[2];
+
+    if (request.method === "OPTIONS") {
+      const res = new Response("Departed", { headers: preflightHeaders });
+      return res;
+    }
 
     if (resource === "appointments") {
       if (method === "GET" && service === "specialties") {
@@ -47,6 +59,17 @@ const server = Bun.serve({
           headers,
           Number(searchParams.get("id_doctor"))
         );
+      }
+
+      if ((method === "POST" || method === "OPTIONS") && service === "dates") {
+        const data = (await request.json()) as {
+          cpf: string;
+          name: string;
+          id_doctor: string;
+          date: string;
+        };
+
+        return createAppointment(db, headers, data);
       }
     }
 

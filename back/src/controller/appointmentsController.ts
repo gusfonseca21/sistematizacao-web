@@ -57,3 +57,34 @@ export async function getDoctorDates(
     });
   }
 }
+
+export async function createAppointment(
+  db: postgres.Sql<{}>,
+  headers: any,
+  requestBody: { cpf: string; name: string; id_doctor: string; date: string }
+) {
+  try {
+    // Checar se o patient já está cadastrado. Se não, cadastrá-lo no BD
+    let patient =
+      await db`SELECT * FROM patients where cpf = ${requestBody.cpf}`;
+
+    if (!patient.length) {
+      patient =
+        await db`INSERT INTO patients (cpf, name) values (${requestBody.cpf}, ${requestBody.name}) RETURNING id`;
+    }
+
+    const response =
+      await db`INSERT INTO appointments (id_doctor, date, id_patient) VALUES (${requestBody.id_doctor}, ${requestBody.date}, ${patient[0]["id"]})`;
+
+    return new Response(JSON.stringify(response), {
+      status: 201,
+      headers,
+    });
+  } catch (error) {
+    console.error("Erro ao criar uma consulta: ", error);
+    return new Response("Erro ao criar consulta", {
+      status: 500,
+      headers,
+    });
+  }
+}

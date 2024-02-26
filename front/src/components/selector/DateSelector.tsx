@@ -15,7 +15,8 @@ interface DateContainerProps {
 }
 
 interface DateSelectorProps {
-  doctorId: number | undefined;
+  doctorId: string | undefined;
+  setDateHandler: (value: string) => void;
 }
 
 function DateContainer({ className, children }: DateContainerProps) {
@@ -30,7 +31,7 @@ function DateContainer({ className, children }: DateContainerProps) {
 
 const URL = import.meta.env.VITE_BACKEND_URL;
 
-async function getDoctorDates(doctorId: number) {
+async function getDoctorDates(doctorId: string) {
   try {
     const { data, status } = await axios.get(
       `${URL}/appointments/dates?id_doctor=${doctorId}`
@@ -40,8 +41,6 @@ async function getDoctorDates(doctorId: number) {
       throw new Error('Resposta inesperada');
     }
 
-    console.log('data', data);
-
     return data as Appointment[];
   } catch (error) {
     console.error('Houve um erro ao retornar as datas do médico: ', error);
@@ -49,7 +48,10 @@ async function getDoctorDates(doctorId: number) {
   }
 }
 
-export default function DateSelector({ doctorId }: DateSelectorProps) {
+export default function DateSelector({
+  doctorId,
+  setDateHandler
+}: DateSelectorProps) {
   const [doctorDates, setDoctorDates] = useState<Appointment[] | undefined>(
     undefined
   );
@@ -92,7 +94,10 @@ export default function DateSelector({ doctorId }: DateSelectorProps) {
         disabled={!doctorId}
         toggleCalendarOnIconClick
         selected={selectedDate}
-        onChange={(date) => setSelectedDate(date ?? new Date())}
+        onChange={(date) => {
+          setSelectedDate(date ?? new Date());
+          setDateHandler(String(date) ?? new Date());
+        }}
         showTimeSelect
         //@ts-expect-error react-datepicker não reconhece locale de date-fns como tipo válido
         locale={ptBR}
@@ -100,7 +105,7 @@ export default function DateSelector({ doctorId }: DateSelectorProps) {
         placeholderText="Data"
         // eslint-disable-next-line tailwindcss/migration-from-tailwind-2
         className={`!focus:border-red-500 w-full ${
-          !doctorId ? '' : 'cursor-pointer'
+          !doctorId ? 'cursor-not-allowed' : 'cursor-pointer'
         } rounded-[4px] border border-custom-light-grey border-opacity-40 p-[0.4rem] ${
           !doctorId ? 'bg-[#F2F2F2]' : 'bg-white'
         }`}

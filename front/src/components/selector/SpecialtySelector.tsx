@@ -6,7 +6,7 @@ import axios from 'axios';
 import { Specialty } from '@shared/index';
 
 interface Props {
-  setSpecialtyId: (id_specialty: number) => void;
+  setSpecialtyId: (id_specialty: string) => void;
 }
 
 const URL = import.meta.env.VITE_BACKEND_URL;
@@ -60,7 +60,9 @@ export default function SpecialtySelector({ setSpecialtyId }: Props) {
         options={specialties}
         getOptionLabel={(option) => option.name}
         getOptionValue={(option) => option.id.toString()}
-        onChange={(newValue) => setSpecialtyId(Number(newValue?.id))}
+        onChange={(newValue) => {
+          if (newValue?.id) setSpecialtyId(newValue.id.toString());
+        }}
         className="w-full"
         maxMenuHeight={200}
         styles={customStyles}
