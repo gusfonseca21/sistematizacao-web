@@ -5,7 +5,7 @@ import ptBR from 'date-fns/locale/pt-BR';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DateSelectorStyle.css';
 import calendarIcon from '../../assets/calendar-days-svgrepo-com.svg';
-import { setHours, setMinutes, parseISO } from 'date-fns';
+import { setHours, setMinutes, parseISO, addDays } from 'date-fns';
 import axios from 'axios';
 import { Appointment } from '@shared/index';
 
@@ -22,7 +22,7 @@ interface DateSelectorProps {
 function DateContainer({ className, children }: DateContainerProps) {
   return (
     <CalendarContainer
-      className={`!overflow-hidden !rounded-xl !border-none ${className}`}
+      className={`border-custom-light-grey !overflow-hidden !rounded-xl !border ${className}`}
     >
       {children}
     </CalendarContainer>
@@ -48,6 +48,10 @@ async function getDoctorDates(doctorId: string) {
   }
 }
 
+const now = new Date();
+
+const datePos18H = now.getHours() >= 17 ? addDays(now, 1) : now;
+
 export default function DateSelector({
   doctorId,
   setDateHandler
@@ -60,19 +64,10 @@ export default function DateSelector({
     undefined
   );
 
+  // Quando selecionamos o dia, checará e setará os horários indisponíveis
   useEffect(() => {
-    if (!doctorDates || !selectedDate) return;
-    const appointDates = doctorDates
-      ?.map((appoint) => parseISO(appoint.date))
-      .filter((appoint) => appoint.getDate() === selectedDate.getDate())
-      .map((appoint) =>
-        setHours(
-          setMinutes(new Date(), appoint.getMinutes()),
-          appoint.getHours() + 3
-        )
-      );
-
-    setTimesToExclude(appointDates);
+    updateAvailableDates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, doctorDates]);
 
   useEffect(() => {
@@ -86,6 +81,36 @@ export default function DateSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doctorId]);
 
+  function updateAvailableDates() {
+    if (!doctorDates || !selectedDate) return;
+    /* Verifica as consultas marcadas do médico e as exclui do calendário caso o usuário
+    selecione o dia dessas consultas */
+    const appointDates = doctorDates
+      ?.map((appoint) => parseISO(appoint.date))
+      .filter((appoint) => appoint.getDate() === selectedDate.getDate())
+      .map((appoint) =>
+        setHours(setMinutes(now, appoint.getMinutes()), appoint.getHours())
+      );
+
+    const selectedDateDay = selectedDate.getDate();
+    const nowDay = now.getDate();
+    const nowHour = now.getHours();
+
+    // Exclui os horários já passados no dia atual
+    // Se o horário passar das 17:30, exclui o dia atual do calendário
+    for (
+      let dayHour = 6;
+      dayHour <= 17 && selectedDateDay === nowDay;
+      dayHour++
+    ) {
+      if (nowHour >= dayHour) {
+        appointDates.push(setHours(setMinutes(now, 0), dayHour));
+      }
+    }
+
+    setTimesToExclude(appointDates);
+  }
+
   return (
     <SelectorWrapper>
       <img src={calendarIcon} alt="Ícone especialidade" className="h-10" />
@@ -95,8 +120,8 @@ export default function DateSelector({
         toggleCalendarOnIconClick
         selected={selectedDate}
         onChange={(date) => {
-          setSelectedDate(date ?? new Date());
-          setDateHandler(String(date) ?? new Date());
+          setSelectedDate(date ?? now);
+          setDateHandler(String(date) ?? now);
         }}
         showTimeSelect
         //@ts-expect-error react-datepicker não reconhece locale de date-fns como tipo válido
@@ -106,13 +131,16 @@ export default function DateSelector({
         // eslint-disable-next-line tailwindcss/migration-from-tailwind-2
         className={`!focus:border-red-500 w-full ${
           !doctorId ? 'cursor-not-allowed' : 'cursor-pointer'
-        } rounded-[4px] border border-custom-light-grey border-opacity-40 p-[0.4rem] ${
+        } border-custom-light-grey rounded-[4px] border border-opacity-40 p-[0.4rem] ${
           !doctorId ? 'bg-[#F2F2F2]' : 'bg-white'
         }`}
+        onCalendarOpen={() => setSelectedDate(datePos18H)}
         calendarContainer={DateContainer}
-        // minTime={setHours(setMinutes(new Date(), 0), 6)}
-        // maxTime={setHours(setMinutes(new Date(), 0), 18)}
+        minTime={setHours(setMinutes(now, 0), 6)}
+        maxTime={setHours(setMinutes(now, 0), 17)}
         excludeTimes={timesToExclude}
+        minDate={datePos18H}
+        timeIntervals={60}
       />
     </SelectorWrapper>
   );

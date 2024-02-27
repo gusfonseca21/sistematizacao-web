@@ -35,8 +35,9 @@ const server = Bun.serve({
     const resource = splittedPath[1];
     const service = splittedPath[2];
 
+    // Evitar erro de CORS em requisições POST
     if (request.method === "OPTIONS") {
-      const res = new Response("Departed", { headers: preflightHeaders });
+      const res = new Response("", { headers: preflightHeaders });
       return res;
     }
 

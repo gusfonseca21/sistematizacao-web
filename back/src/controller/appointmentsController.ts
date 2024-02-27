@@ -1,3 +1,4 @@
+import { PostgresError } from "postgres";
 import type postgres from "postgres";
 
 export async function getAllSpecialties(db: postgres.Sql<{}>, headers: any) {
@@ -81,10 +82,20 @@ export async function createAppointment(
       headers,
     });
   } catch (error) {
-    console.error("Erro ao criar uma consulta: ", error);
-    return new Response("Erro ao criar consulta", {
-      status: 500,
-      headers,
-    });
+    // Erro 23505 = duplicate key value violates unique constraint "unique_appointment"
+    if ((error as PostgresError).code === "23505") {
+      return new Response(
+        "Erro ao marcar consulta. Já existe uma consulta com esses dados.",
+        {
+          status: 409,
+          headers,
+        }
+      );
+    } else {
+      return new Response("Erro ao marcar consulta", {
+        status: 500,
+        headers,
+      });
+    }
   }
 }
