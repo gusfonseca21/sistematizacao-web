@@ -7,12 +7,14 @@ export async function getAllSpecialties(db: postgres.Sql<{}>, headers: any) {
 
     return new Response(JSON.stringify(specialties), {
       status: 200,
+      statusText: "success",
       headers,
     });
   } catch (error) {
     console.error("Erro ao retornar todas as especialidades: ", error);
-    return new Response("Erro ao retornar especialidades", {
+    return new Response(null, {
       status: 500,
+      statusText: "failed",
       headers,
     });
   }
@@ -27,14 +29,19 @@ export async function getSpecialtyDoctor(
     const doctors =
       await db`SELECT * FROM doctors WHERE id_specialty = ${id_specialty}`;
 
-    return new Response(JSON.stringify(doctors), { status: 200, headers });
+    return new Response(JSON.stringify(doctors), {
+      status: 200,
+      statusText: "success",
+      headers,
+    });
   } catch (error) {
     console.error(
       "Erro ao retornar os médicos relacionados à uma especialidade: ",
       error
     );
-    return new Response("Erro ao retornar especialidades", {
+    return new Response(null, {
       status: 500,
+      statusText: "failed",
       headers,
     });
   }
@@ -49,11 +56,16 @@ export async function getDoctorDates(
     const dates =
       await db`SELECT * FROM appointments WHERE id_doctor = ${id_doctor}`;
 
-    return new Response(JSON.stringify(dates), { status: 200, headers });
+    return new Response(JSON.stringify(dates), {
+      status: 200,
+      statusText: "success",
+      headers,
+    });
   } catch (error) {
     console.error("Erro ao retornar as consultas do médico: ", error);
-    return new Response("Erro ao retornar consultas", {
+    return new Response(null, {
       status: 500,
+      statusText: "failed",
       headers,
     });
   }
@@ -79,21 +91,21 @@ export async function createAppointment(
 
     return new Response(JSON.stringify(response), {
       status: 201,
+      statusText: "success",
       headers,
     });
   } catch (error) {
-    // Erro 23505 = duplicate key value violates unique constraint "unique_appointment"
+    // Erro 23505 = duplicate key value violates unique constraint "unique_appointment (id_patient - date)"
     if ((error as PostgresError).code === "23505") {
-      return new Response(
-        "Erro ao marcar consulta. Já existe uma consulta com esses dados.",
-        {
-          status: 409,
-          headers,
-        }
-      );
+      return new Response(null, {
+        status: 409,
+        statusText: "failed",
+        headers,
+      });
     } else {
-      return new Response("Erro ao marcar consulta", {
+      return new Response(null, {
         status: 500,
+        statusText: "failed",
         headers,
       });
     }

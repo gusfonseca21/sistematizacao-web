@@ -13,7 +13,8 @@ export default {
           background: '#64d3d6',
           text: '#333',
           'navy-blue': '#000080',
-          'light-grey': '#888'
+          'light-grey': '#888',
+          card: '#E0F6F7'
         }
       }
     }

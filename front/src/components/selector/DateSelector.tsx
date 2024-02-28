@@ -22,7 +22,7 @@ interface DateSelectorProps {
 function DateContainer({ className, children }: DateContainerProps) {
   return (
     <CalendarContainer
-      className={`border-custom-light-grey !overflow-hidden !rounded-xl !border ${className}`}
+      className={`!overflow-hidden !rounded-xl !border border-custom-light-grey ${className}`}
     >
       {children}
     </CalendarContainer>
@@ -49,8 +49,6 @@ async function getDoctorDates(doctorId: string) {
 }
 
 const now = new Date();
-
-const datePos18H = now.getHours() >= 17 ? addDays(now, 1) : now;
 
 export default function DateSelector({
   doctorId,
@@ -83,7 +81,7 @@ export default function DateSelector({
 
   function updateAvailableDates() {
     if (!doctorDates || !selectedDate) return;
-    /* Verifica as consultas marcadas do médico e as exclui do calendário caso o usuário
+    /* Verifica as consultas marcadas do médico e as bloqueiam no calendário caso o usuário
     selecione o dia dessas consultas */
     const appointDates = doctorDates
       ?.map((appoint) => parseISO(appoint.date))
@@ -91,22 +89,6 @@ export default function DateSelector({
       .map((appoint) =>
         setHours(setMinutes(now, appoint.getMinutes()), appoint.getHours())
       );
-
-    const selectedDateDay = selectedDate.getDate();
-    const nowDay = now.getDate();
-    const nowHour = now.getHours();
-
-    // Exclui os horários já passados no dia atual
-    // Se o horário passar das 17:30, exclui o dia atual do calendário
-    for (
-      let dayHour = 6;
-      dayHour <= 17 && selectedDateDay === nowDay;
-      dayHour++
-    ) {
-      if (nowHour >= dayHour) {
-        appointDates.push(setHours(setMinutes(now, 0), dayHour));
-      }
-    }
 
     setTimesToExclude(appointDates);
   }
@@ -118,6 +100,7 @@ export default function DateSelector({
         key={doctorId}
         disabled={!doctorId}
         toggleCalendarOnIconClick
+        openToDate={addDays(now, 1)}
         selected={selectedDate}
         onChange={(date) => {
           setSelectedDate(date ?? now);
@@ -131,15 +114,14 @@ export default function DateSelector({
         // eslint-disable-next-line tailwindcss/migration-from-tailwind-2
         className={`!focus:border-red-500 w-full ${
           !doctorId ? 'cursor-not-allowed' : 'cursor-pointer'
-        } border-custom-light-grey rounded-[4px] border border-opacity-40 p-[0.4rem] ${
+        } rounded-[4px] border border-custom-light-grey border-opacity-40 p-[0.4rem] ${
           !doctorId ? 'bg-[#F2F2F2]' : 'bg-white'
         }`}
-        onCalendarOpen={() => setSelectedDate(datePos18H)}
         calendarContainer={DateContainer}
         minTime={setHours(setMinutes(now, 0), 6)}
         maxTime={setHours(setMinutes(now, 0), 17)}
         excludeTimes={timesToExclude}
-        minDate={datePos18H}
+        minDate={addDays(now, 1)}
         timeIntervals={60}
       />
     </SelectorWrapper>
