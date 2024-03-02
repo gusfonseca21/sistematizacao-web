@@ -1,6 +1,8 @@
 import {
+  cancelAppointment,
   createAppointment,
   getAllSpecialties,
+  getAppointment,
   getDoctorDates,
   getSpecialtyDoctor,
 } from "./controller/appointmentsController";
@@ -16,7 +18,7 @@ const headers = new Headers({
 
 const preflightHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "OPTIONS, POST",
+  "Access-Control-Allow-Methods": "OPTIONS, POST, PATCH",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
@@ -62,6 +64,10 @@ const server = Bun.serve({
         );
       }
 
+      if (method === "GET" && service === "search") {
+        return getAppointment(db, headers, searchParams.get("cpf"));
+      }
+
       if ((method === "POST" || method === "OPTIONS") && service === "dates") {
         const data = (await request.json()) as {
           cpf: string;
@@ -72,6 +78,13 @@ const server = Bun.serve({
 
         return createAppointment(db, headers, data);
       }
+    }
+
+    if ((method === "PATCH" || method === "OPTIONS") && service === "cancel") {
+      const data = (await request.json()) as {
+        id_appointment: string;
+      };
+      return cancelAppointment(db, headers, data.id_appointment);
     }
 
     return new Response("Não encontrado", { status: 404, headers });

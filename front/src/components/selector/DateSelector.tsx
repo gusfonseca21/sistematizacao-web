@@ -31,24 +31,7 @@ function DateContainer({ className, children }: DateContainerProps) {
 
 const URL = import.meta.env.VITE_BACKEND_URL;
 
-async function getDoctorDates(doctorId: string) {
-  try {
-    const { data, status } = await axios.get(
-      `${URL}/appointments/dates?id_doctor=${doctorId}`
-    );
-
-    if (status !== 200) {
-      throw new Error('Resposta inesperada');
-    }
-
-    return data as Appointment[];
-  } catch (error) {
-    console.error('Houve um erro ao retornar as datas do médico: ', error);
-    return;
-  }
-}
-
-const now = new Date();
+const NOW = new Date();
 
 export default function DateSelector({
   doctorId,
@@ -79,6 +62,23 @@ export default function DateSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doctorId]);
 
+  async function getDoctorDates(doctorId: string) {
+    try {
+      const { data, status } = await axios.get(
+        `${URL}/appointments/dates?id_doctor=${doctorId}`
+      );
+
+      if (status !== 200) {
+        throw new Error('Resposta inesperada');
+      }
+
+      return data as Appointment[];
+    } catch (error) {
+      console.error('Houve um erro ao retornar as datas do médico: ', error);
+      return;
+    }
+  }
+
   function updateAvailableDates() {
     if (!doctorDates || !selectedDate) return;
     /* Verifica as consultas marcadas do médico e as bloqueiam no calendário caso o usuário
@@ -87,10 +87,27 @@ export default function DateSelector({
       ?.map((appoint) => parseISO(appoint.date))
       .filter((appoint) => appoint.getDate() === selectedDate.getDate())
       .map((appoint) =>
-        setHours(setMinutes(now, appoint.getMinutes()), appoint.getHours())
+        setHours(setMinutes(NOW, appoint.getMinutes()), appoint.getHours())
       );
 
     setTimesToExclude(appointDates);
+  }
+
+  function isWeekend(date: Date): boolean {
+    return date.getDay() !== 0 && date.getDay() !== 6;
+  }
+
+  function setDateOnCalendarOpen() {
+    if (!selectedDate) {
+      setSelectedDate(nowSkipWeekends());
+    }
+  }
+
+  function nowSkipWeekends() {
+    // Ao abrir o calendário o horário inicialmente selecionado sempre será 06:00
+    const updatedDate = setMinutes(setHours(NOW, 6), 0);
+    if (updatedDate.getDay() === 6) return addDays(updatedDate, 2);
+    else return addDays(updatedDate, 1);
   }
 
   return (
@@ -100,13 +117,15 @@ export default function DateSelector({
         key={doctorId}
         disabled={!doctorId}
         toggleCalendarOnIconClick
-        openToDate={addDays(now, 1)}
+        openToDate={nowSkipWeekends()}
+        // openToDate={NOW.getDay() === 6 ? addDays(NOW, 2) : addDays(NOW, 1)}
         selected={selectedDate}
         onChange={(date) => {
-          setSelectedDate(date ?? now);
-          setDateHandler(String(date) ?? now);
+          setSelectedDate(date ?? NOW);
+          setDateHandler(String(date) ?? NOW);
         }}
         showTimeSelect
+        onCalendarOpen={setDateOnCalendarOpen}
         //@ts-expect-error react-datepicker não reconhece locale de date-fns como tipo válido
         locale={ptBR}
         dateFormat="dd/MM/yyyy 'às' HH:mm"
@@ -118,10 +137,11 @@ export default function DateSelector({
           !doctorId ? 'bg-[#F2F2F2]' : 'bg-white'
         }`}
         calendarContainer={DateContainer}
-        minTime={setHours(setMinutes(now, 0), 6)}
-        maxTime={setHours(setMinutes(now, 0), 17)}
+        minTime={setHours(setMinutes(NOW, 0), 6)}
+        maxTime={setHours(setMinutes(NOW, 0), 17)}
         excludeTimes={timesToExclude}
-        minDate={addDays(now, 1)}
+        minDate={addDays(NOW, 1)}
+        filterDate={(date) => isWeekend(date)}
         timeIntervals={60}
       />
     </SelectorWrapper>

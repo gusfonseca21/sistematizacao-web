@@ -3,7 +3,7 @@ import type postgres from "postgres";
 
 export async function getAllSpecialties(db: postgres.Sql<{}>, headers: any) {
   try {
-    const specialties = await db`SELECT * from specialties`;
+    const specialties = await db`SELECT * FROM specialties`;
 
     return new Response(JSON.stringify(specialties), {
       status: 200,
@@ -54,7 +54,7 @@ export async function getDoctorDates(
 ) {
   try {
     const dates =
-      await db`SELECT * FROM appointments WHERE id_doctor = ${id_doctor}`;
+      await db`SELECT * FROM appointments WHERE id_doctor = ${id_doctor} AND canceled = 0`;
 
     return new Response(JSON.stringify(dates), {
       status: 200,
@@ -79,11 +79,11 @@ export async function createAppointment(
   try {
     // Checar se o patient já está cadastrado. Se não, cadastrá-lo no BD
     let patient =
-      await db`SELECT * FROM patients where cpf = ${requestBody.cpf}`;
+      await db`SELECT * FROM patients WHERE cpf = ${requestBody.cpf}`;
 
     if (!patient.length) {
       patient =
-        await db`INSERT INTO patients (cpf, name) values (${requestBody.cpf}, ${requestBody.name}) RETURNING id`;
+        await db`INSERT INTO patients (cpf, name) VALUES (${requestBody.cpf}, ${requestBody.name}) RETURNING id`;
     }
 
     const response =
@@ -109,5 +109,111 @@ export async function createAppointment(
         headers,
       });
     }
+  }
+}
+
+export async function getAppointment(
+  db: postgres.Sql<{}>,
+  headers: any,
+  cpf: string | null
+) {
+  try {
+    if (!cpf) {
+      return new Response(null, {
+        status: 400,
+        statusText: "failed",
+        headers,
+      });
+    }
+
+    let patient = await db`SELECT * FROM patients WHERE cpf = ${cpf}`;
+
+    if (!patient.length) {
+      return new Response(null, {
+        status: 404,
+        statusText: "failed",
+        headers,
+      });
+    }
+
+    let patientAppointments =
+      await db`SELECT * FROM appointments WHERE id_patient = ${patient[0]["id"]}`;
+
+    const appointments = await Promise.all(
+      patientAppointments.map(async (appointment) => {
+        const doctor =
+          await db`SELECT name, id_specialty FROM doctors WHERE id = ${appointment["id_doctor"]}`;
+        const specialty =
+          await db`SELECT name FROM specialties WHERE id = ${doctor[0]["id_specialty"]}`;
+        const patient =
+          await db`SELECT name FROM patients WHERE id = ${appointment["id_patient"]}`;
+
+        return {
+          id: appointment["id"],
+          doctor: doctor[0]["name"],
+          specialty: specialty[0]["name"],
+          date: appointment["date"],
+          patient: patient[0]["name"],
+          canceled: appointment["canceled"],
+        };
+      })
+    );
+
+    return new Response(JSON.stringify(appointments), {
+      status: 200,
+      statusText: "success",
+      headers,
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(null, {
+      status: 500,
+      statusText: "failed",
+      headers,
+    });
+  }
+}
+
+export async function cancelAppointment(
+  db: postgres.Sql<{}>,
+  headers: any,
+  id_appointment: string | null
+) {
+  try {
+    if (!id_appointment) {
+      return new Response(null, {
+        status: 400,
+        statusText: "failed",
+        headers,
+      });
+    }
+
+    const appointment =
+      await db`SELECT * FROM appointments WHERE id = ${id_appointment}`;
+
+    if (!appointment.length) {
+      return new Response(null, {
+        status: 404,
+        statusText: "failed",
+        headers,
+      });
+    }
+
+    const alteredAppointment =
+      await db`UPDATE appointments SET canceled = 1 WHERE id = ${id_appointment}`;
+
+    console.log("alteredAppointment", alteredAppointment);
+    return new Response("penis", {
+      status: 200,
+      statusText: "success",
+      headers,
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(null, {
+      status: 500,
+      statusText: "failed",
+      headers,
+    });
   }
 }

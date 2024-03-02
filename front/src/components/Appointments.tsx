@@ -3,6 +3,7 @@ import Selectors from './selector/Selectors';
 import axios, { isAxiosError } from 'axios';
 import { format, sub } from 'date-fns';
 import Inputs from './inputs/Inputs';
+import Button from './Button';
 
 const URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -48,14 +49,12 @@ export default function Appointments() {
     if (!isDateValid() || !isNameValid) return;
 
     try {
-      const response = await axios.post(`${URL}/appointments/dates`, {
+      await axios.post(`${URL}/appointments/dates`, {
         cpf: patientCpf,
         name: patientName,
         id_doctor: doctorId,
         date: format(sub(date, { hours: 3 }), 'yyyy-MM-dd HH:mm:ss.SSS')
       });
-
-      if (response.status === 409) console.log('BUCETA');
 
       setSuccess('Sua consulta foi marcada com sucesso!');
       setTimeout(() => setSuccess(null), 5000);
@@ -133,19 +132,11 @@ export default function Appointments() {
             buttonDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
           }`}
         >
-          <button
-            onClick={createAppointment}
-            className={`h-16 w-[17rem] rounded-xl ${
-              buttonDisabled ? 'bg-gray-500' : 'bg-blue-600'
-            } ${
-              buttonDisabled ? 'pointer-events-none' : 'pointer-events-auto'
-            } ${
-              buttonDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
-            } p-2 font-semibold text-white shadow-md transition hover:-translate-y-1 hover:bg-blue-700 hover:shadow-xl active:translate-y-[0.5] active:shadow-lg`}
+          <Button
+            action={createAppointment}
             disabled={buttonDisabled}
-          >
-            Marcar consulta
-          </button>
+            title="Marcar consulta"
+          />
         </div>
         {error ? (
           <div className="-mt-5">

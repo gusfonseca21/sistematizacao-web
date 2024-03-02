@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Appointments from './Appointments';
+import Search from './Search';
 
 const SELECTED_TAB_STYLE = 'border-b-2 border-b-custom-navy-blue';
 
@@ -43,9 +44,10 @@ export default function Card() {
   }
 
   return (
-    <div className="relative min-h-[30rem] w-[60rem] rounded-[50px] bg-custom-card  p-5 font-sans shadow-lg">
+    <div className="relative min-h-[30rem] w-[60rem] overflow-hidden rounded-[50px]  bg-custom-card p-1 font-sans shadow-lg">
       <Tabs selectedTab={selectedTab} selectTab={selectTabHandler} />
       {selectedTab === 1 && <Appointments />}
+      {selectedTab === 2 && <Search />}
     </div>
   );
 }
