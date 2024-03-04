@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Selectors from './selector/Selectors';
 import axios, { isAxiosError } from 'axios';
 import { format, sub } from 'date-fns';
@@ -119,6 +119,7 @@ export default function Appointments() {
       </div>
       <div className="flex flex-col items-center gap-10">
         <Selectors
+          doctorId={doctorId}
           setDocorIdHandler={setDocorIdHandler}
           setDateHandler={setDateHandler}
         />

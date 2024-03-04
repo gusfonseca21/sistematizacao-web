@@ -137,7 +137,7 @@ export async function getAppointment(
     }
 
     let patientAppointments =
-      await db`SELECT * FROM appointments WHERE id_patient = ${patient[0]["id"]}`;
+      await db`SELECT * FROM appointments WHERE id_patient = ${patient[0]["id"]} AND date >= NOW()`;
 
     const appointments = await Promise.all(
       patientAppointments.map(async (appointment) => {
@@ -199,10 +199,8 @@ export async function cancelAppointment(
       });
     }
 
-    const alteredAppointment =
-      await db`UPDATE appointments SET canceled = 1 WHERE id = ${id_appointment}`;
+    await db`UPDATE appointments SET canceled = 1 WHERE id = ${id_appointment}`;
 
-    console.log("alteredAppointment", alteredAppointment);
     return new Response("penis", {
       status: 200,
       statusText: "success",

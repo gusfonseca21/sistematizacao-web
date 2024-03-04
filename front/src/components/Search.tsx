@@ -38,13 +38,9 @@ function AppointmentsTable({
     );
   }, [appointments]);
 
-  useEffect(() => {
-    console.log('canceledState', canceledState);
-  }, [canceledState]);
-
   async function cancelAppointment(id_appointment: number) {
     try {
-      const response = await axios.patch(`${URL}/appointments/cancel`, {
+      await axios.patch(`${URL}/appointments/cancel`, {
         id_appointment
       });
       setCanceledState((prevState) => {
@@ -56,7 +52,6 @@ function AppointmentsTable({
           }
         });
       });
-      console.log('response', response);
     } catch (error) {
       console.error(error);
     }
@@ -68,7 +63,7 @@ function AppointmentsTable({
       <thead>
         <tr>
           <th>Paciente</th>
-          <th>Médio(a)</th>
+          <th>Médico(a)</th>
           <th>Especialidade</th>
           <th>Data</th>
           <th></th>
@@ -130,6 +125,7 @@ export default function Search() {
   }
 
   async function getAppointments() {
+    setAppointments([]);
     setError('');
     try {
       const { data } = await axios.get(`${URL}/appointments/search?cpf=${cpf}`);
@@ -169,7 +165,7 @@ export default function Search() {
           title="Buscar"
         />
         {error.trim().length ? <p className="text-red-500">{error}</p> : null}
-        {appointments ? (
+        {appointments?.length ? (
           <div className="max-h-40 w-[55rem] overflow-hidden overflow-y-scroll rounded-lg bg-white shadow-md">
             <AppointmentsTable appointments={appointments} />
           </div>

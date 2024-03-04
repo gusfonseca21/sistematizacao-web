@@ -3,7 +3,12 @@ import docIcon from '../../assets/physician-profession-doctor-medic-svgrepo-com.
 import SelectorWrapper from './SelectorWrapper';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Doctor } from '@shared/index';
+
+type Doctor = {
+  id: number;
+  name: string;
+  id_specialty: number;
+};
 
 interface Props {
   specialtyId: string;
@@ -71,6 +76,7 @@ export default function DoctorSelector({ specialtyId, setDoctorId }: Props) {
         getOptionLabel={(option) => option.name}
         getOptionValue={(option) => option.id.toString() as string}
         onChange={(newValue) => {
+          if (!newValue) return;
           // @ts-expect-error Erro em relação ao tipo esperado de newValue
           setDoctorId(newValue?.id);
         }}

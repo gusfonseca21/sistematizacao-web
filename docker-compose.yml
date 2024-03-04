@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:14.10
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5433:5432
+    networks:
+      - shared-network
+    volumes:
+      - ./postgres-db:/var/lib/postgresql/data
+
+  front:
+    container_name: front
+    restart: unless-stopped
+    image: front
+    build:
+      context: front
+      dockerfile: Dockerfile
+    ports:
+      - 5000:4173
+    networks:
+      - shared-network
+    depends_on:
+      - back
+
+  back:
+    container_name: back
+    restart: unless-stopped
+    image: back
+    build:
+      context: back
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - shared-network
+    depends_on:
+      - postgres
+
+networks:
+  shared-network:

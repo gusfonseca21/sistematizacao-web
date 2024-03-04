@@ -13,9 +13,10 @@ export async function connectDatabase() {
 
     const sql = postgres(DB);
 
-    const [{ version }] = await sql`SELECT version()`;
+    // const [{ version }] = await sql`SELECT version()`;
 
-    console.log(`Base de Dados conectada com sucesso. Versão: ${version}`);
+    // console.log(`Base de Dados conectada com sucesso. Versão: ${version}`);
+    console.log(`Base de Dados conectada com sucesso.`);
     return sql;
   } catch (error) {
     console.error("Erro ao se conectar com a base de dados: ", error);

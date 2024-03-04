@@ -3,7 +3,11 @@ import specIcon from '../../assets/medical-prescription-svgrepo-com.svg';
 import SelectorWrapper from './SelectorWrapper';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Specialty } from '@shared/index';
+
+type Specialty = {
+  id: number;
+  name: string;
+};
 
 interface Props {
   setSpecialtyId: (id_specialty: string) => void;

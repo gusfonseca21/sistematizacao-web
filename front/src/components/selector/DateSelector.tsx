@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import SelectorWrapper from './SelectorWrapper';
 import ReactDatePicker, { CalendarContainer } from 'react-datepicker';
 import ptBR from 'date-fns/locale/pt-BR';
@@ -7,7 +7,13 @@ import './DateSelectorStyle.css';
 import calendarIcon from '../../assets/calendar-days-svgrepo-com.svg';
 import { setHours, setMinutes, parseISO, addDays } from 'date-fns';
 import axios from 'axios';
-import { Appointment } from '@shared/index';
+
+type Appointment = {
+  id: number;
+  id_doctor: number;
+  id_patient: number;
+  date: string;
+};
 
 interface DateContainerProps {
   className: string;
@@ -15,7 +21,7 @@ interface DateContainerProps {
 }
 
 interface DateSelectorProps {
-  doctorId: string | undefined;
+  doctorId: string;
   setDateHandler: (value: string) => void;
 }
 
@@ -52,7 +58,10 @@ export default function DateSelector({
   }, [selectedDate, doctorDates]);
 
   useEffect(() => {
-    if (!doctorId) return;
+    if (!doctorId) {
+      setSelectedDate(undefined);
+      return;
+    }
     setSelectedDate(undefined);
     (async () => {
       const data = await getDoctorDates(doctorId);
