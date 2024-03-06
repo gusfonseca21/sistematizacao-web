@@ -2,13 +2,13 @@
 
 1. Clone o repositório na sua máquina.
 
-2. No caminho `sistematizacao-web/back`, crie um arquivo `.env` e adicione a seguinte variável:
+2. No caminho `sistematizacao-web/back`, crie um arquivo `.env` e adicione a seguinte variável para ligar o back-end com o banco de dados:
 
    ```
    DB=postgres://postgres:postgres@postgres:5432/postgres?search_path=sistematizacao-web
    ```
 
-3. No caminho `sistematizacao-web/front`, crie um arquivo `.env` e adicione a seguinte variável:
+3. No caminho `sistematizacao-web/front`, crie um arquivo `.env` e adicione a seguinte variável para ligar o front-end com o back-end:
 
    ```
    VITE_BACKEND_URL=http://localhost:3000
@@ -16,7 +16,7 @@
 
 4. Se ainda não possuir o Docker e o Docker Compose, instale-os: [Docker](https://docs.docker.com/get-docker/) | [Docker Compose](https://docs.docker.com/compose/)
 
-5. Com o terminal no caminho `sistematizacao-web`, execute o comando:
+5. Com o terminal no caminho `sistematizacao-web`, execute o seguinte comando para montar executar o contêiner da aplicação:
 
    ```
    docker compose up
