@@ -44,7 +44,7 @@ export default function Card() {
   }
 
   return (
-    <div className="relative min-h-[30rem] w-[60rem] overflow-hidden rounded-[50px]  bg-custom-card p-1 font-sans shadow-lg">
+    <div className="relative min-h-[30rem] w-[60rem] overflow-hidden  rounded-[50px] bg-custom-card p-1 font-sans shadow-lg">
       <Tabs selectedTab={selectedTab} selectTab={selectTabHandler} />
       {selectedTab === 1 && <Appointments />}
       {selectedTab === 2 && <Search />}

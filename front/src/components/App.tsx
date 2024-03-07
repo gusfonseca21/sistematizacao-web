@@ -3,7 +3,7 @@ import Logo from './Logo';
 
 function App() {
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center gap-12 bg-custom-background">
+    <div className="flex min-h-screen min-w-fit flex-col items-center justify-center gap-12 bg-custom-background">
       <Logo />
       <Card />
     </div>
