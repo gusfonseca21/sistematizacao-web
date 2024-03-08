@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Selectors from './selector/Selectors';
 import axios, { isAxiosError } from 'axios';
-import { format, sub } from 'date-fns';
+import { format, add } from 'date-fns';
 import Inputs from './inputs/Inputs';
 import Button from './Button';
 
@@ -53,7 +53,7 @@ export default function Appointments() {
         cpf: patientCpf,
         name: patientName,
         id_doctor: doctorId,
-        date: format(sub(date, { hours: 3 }), 'yyyy-MM-dd HH:mm:ss.SSS')
+        date: format(add(date, { hours: 3 }), 'yyyy-MM-dd HH:mm:ss.SSS')
       });
 
       setSuccess('Sua consulta foi marcada com sucesso!');
