@@ -90,14 +90,17 @@ export async function createAppointment(
     const patientAppointmentsDates =
       await db`SELECT date FROM appointments WHERE id_patient = ${patient[0]["id"]} AND canceled = 0`;
 
-    const newAppointmentDateTime = new Date(
-      new Date(requestBody.date).getTime()
-    );
-
+    const newAppointmentDateTime = new Date(requestBody.date).getTime();
     let duplicatedDate: boolean = false;
 
     if (patientAppointmentsDates.length) {
       patientAppointmentsDates.forEach((appointment) => {
+        console.log(
+          'appointment["date"].getTime()',
+          appointment["date"].getTime()
+        );
+        console.log("newAppointmentDateTime", newAppointmentDateTime);
+
         if (appointment["date"].getTime() === newAppointmentDateTime) {
           duplicatedDate = true;
         }
