@@ -63,7 +63,7 @@ export default function Appointments() {
       if (isAxiosError(error)) {
         if (error.response?.status === 409) {
           const errorText =
-            'Erro ao marcar nova consulta. O paciente já possui uma consulta neste horário.';
+            'Erro ao marcar nova consulta. Já existe uma consulta neste horário.';
           console.error('Erro ao marcar consulta: ', error);
           setError(errorText);
         } else {

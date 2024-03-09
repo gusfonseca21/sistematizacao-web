@@ -421,7 +421,7 @@ ALTER TABLE ONLY "sistematizacao-web".specialties
 -- Name: unique_appointment_time; Type: INDEX; Schema: sistematizacao-web; Owner: postgres
 --
 
-CREATE UNIQUE INDEX unique_appointment_time ON "sistematizacao-web".appointments USING btree (date) WHERE (canceled = 0);
+CREATE UNIQUE INDEX unique_appointment_time ON "sistematizacao-web".appointments (id_doctor, date) WHERE (canceled = 0);
 
 
 --

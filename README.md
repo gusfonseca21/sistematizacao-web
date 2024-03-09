@@ -19,10 +19,10 @@
 5. Com o terminal no caminho `sistematizacao-web`, execute o seguinte comando para montar executar o contêiner da aplicação:
 
    ```
-   docker compose up
+   docker compose up -d
    ```
 
-6. Execute o comando `docker ps -a` para listar os contêineres que estão rodando no Docker e copie o ID do contêiner da imagem do PostgreSQL.
+6. Execute o comando `docker ps -a` para listar os contêineres que estão rodando no Docker e copie o ID do contêiner rodando o PostgreSQL.
 
 7. Execute o comando:
 
@@ -35,7 +35,7 @@
 8. Execute o comando:
 
    ```
-   docker exec -it ID_IMAGEM bash
+   docker exec -it ID_CONTEINER bash
    ```
 
    para poder executar comandos dentro do contêiner selecionado utilizando o terminal bash.

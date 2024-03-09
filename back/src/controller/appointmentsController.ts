@@ -86,6 +86,32 @@ export async function createAppointment(
         await db`INSERT INTO patients (cpf, name) VALUES (${requestBody.cpf}, ${requestBody.name}) RETURNING id`;
     }
 
+    // Checar se o paciente já possui outra consulta no mesmo horário
+    const patientAppointmentsDates =
+      await db`SELECT date FROM appointments WHERE id_patient = ${patient[0]["id"]} AND canceled = 0`;
+
+    const newAppointmentDateTime = new Date(
+      new Date(requestBody.date).getTime()
+    );
+
+    let duplicatedDate: boolean = false;
+
+    if (patientAppointmentsDates.length) {
+      patientAppointmentsDates.forEach((appointment) => {
+        if (appointment["date"].getTime() === newAppointmentDateTime) {
+          duplicatedDate = true;
+        }
+      });
+    }
+
+    if (duplicatedDate) {
+      return new Response(null, {
+        status: 409,
+        statusText: "failed",
+        headers,
+      });
+    }
+
     const response =
       await db`INSERT INTO appointments (id_doctor, date, id_patient) VALUES (${requestBody.id_doctor}, ${requestBody.date}, ${patient[0]["id"]})`;
 
@@ -95,6 +121,7 @@ export async function createAppointment(
       headers,
     });
   } catch (error) {
+    console.log("error", error);
     // Erro 23505 = duplicate key value violates unique constraint "unique_appointment (id_patient - date)"
     if ((error as PostgresError).code === "23505") {
       return new Response(null, {
